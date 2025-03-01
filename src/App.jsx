@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import "./app.css"
+import "./App.css"
 
 const flashcards = [
   {
