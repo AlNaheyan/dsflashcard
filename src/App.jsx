@@ -5,66 +5,65 @@ import "./App.css"
 
 const flashcards = [
   {
-    question: "What is the time complexity of accessing an element in an array?",
-    answer: "O(1), as arrays allow direct access to any element using its index.",
+    question: "What is the time complexity of accessing an element in an array using an index?",
+    answer: "O(1)",
     difficulty: "easy",
   },
   {
-    question: "Explain the difference between a stack and a queue.",
-    answer: "A stack follows LIFO (Last In, First Out), while a queue follows FIFO (First In, First Out).",
+    question: "What is the key difference between how a stack and a queue process elements?",
+    answer: "Stack uses LIFO, Queue uses FIFO",
     difficulty: "easy",
   },
   {
-    question: "How does a linked list differ from an array?",
-    answer:
-      "A linked list consists of nodes with data and pointers, while an array stores elements in contiguous memory.",
+    question: "How does a linked list store elements differently from an array?",
+    answer: "List uses pointers, Array in memory",
     difficulty: "easy",
   },
   {
-    question: "What is the time complexity for searching an element in a binary search tree (BST)?",
-    answer: "O(log n) on average, but O(n) in the worst case for an unbalanced tree.",
+    question: "What is the average and worst-case time complexity for searching in a Binary Search Tree (BST)?",
+    answer: "O(log n) avg, O(n) worst",
     difficulty: "medium",
   },
   {
-    question: "What is a hash collision and how can it be resolved?",
-    answer:
-      "A hash collision happens when two keys hash to the same index. It can be resolved by chaining or open addressing.",
+    question: "What is a hash collision in a hash table?",
+    answer: "Two keys map to the same index",
     difficulty: "medium",
   },
   {
-    question: "How would you implement a breadth-first search (BFS) algorithm on a graph?",
-    answer: "BFS uses a queue to visit nodes level by level, starting from the source and exploring neighbors first.",
+    question: "What are two common methods to resolve hash collisions?",
+    answer: "Chaining, open addressing",
     difficulty: "medium",
   },
   {
-    question: "Describe how a priority queue works and give an example use case.",
-    answer:
-      "A priority queue processes elements based on priority. It's used in algorithms like Dijkstra's for shortest path.",
+    question: "How does the Breadth-First Search (BFS) algorithm explore a graph?",
+    answer: "Uses a queue, explores level by level",
     difficulty: "medium",
   },
   {
-    question: "What is the difference between a red-black tree and an AVL tree?",
-    answer:
-      "Red-black trees offer more flexibility with balancing, while AVL trees are more strict, requiring more rotations.",
+    question: "What is a priority queue, and what is one common use case?",
+    answer: "Processes elements by priority, used in Dijkstra’s",
+    difficulty: "medium",
+  },
+  {
+    question: "How does a trie data structure store words efficiently?",
+    answer: "Stores words in a tree by characters",
     difficulty: "hard",
   },
   {
-    question: "How does a trie data structure work and what is it typically used for?",
-    answer:
-      "A trie stores strings in a tree structure, with each node representing a character. It's used for efficient searching and autocomplete.",
+    question: "What is the time complexity of Dijkstra’s algorithm using a priority queue?",
+    answer: "O((V + E) log V)",
     difficulty: "hard",
   },
-  {
-    question:
-      "What is the time complexity of finding the shortest path using Dijkstra's algorithm with a priority queue?",
-    answer: "O((V + E) log V), where V is the number of vertices and E is the number of edges.",
-    difficulty: "hard",
-  },
-]
+];
+
 
 function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
+  const [userInput, setUserInput] = useState('')
+  const [topScore, setTopScore] = useState(0)
+  const [currStreak, setCurrStreak] = useState(0)
+  const [AfterMsg, setAftertMsg] = useState("")
 
   const handleCardClick = () => {
     setShowAnswer(!showAnswer)
@@ -72,12 +71,19 @@ function App() {
 
   const handleNextClick = () => {
     setShowAnswer(false)
+    setAftertMsg("")
     setCurrentIndex((prevIndex) => (prevIndex + 1) % flashcards.length)
   }
 
   const handlePrevClick = () => {
     setShowAnswer(false)
+    setAftertMsg("")
     setCurrentIndex((prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length)
+  }
+
+  const handleShuffle = () => {
+    const randomIndex = Math.floor(Math.random() * flashcards.length) + 1;
+    setCurrentIndex(randomIndex)
   }
 
   const getDifficultyColor = (difficulty) => {
@@ -92,12 +98,48 @@ function App() {
         return ""
     }
   }
+  const handleScore = () => {
+    setTopScore(prevScore =>prevScore + 1)
+    setCurrStreak(prevStreak => prevStreak + 1)
+  }
+
+  const handleuserInput = (event) => {
+    setUserInput(event.target.value)
+  }
+
+  const checkUserAnswer = (event) => {
+    event.preventDefault()
+    const userWords = userInput.trim().toLowerCase().split(/\s+/)
+    const answerWords = flashcards[currentIndex].answer.toLowerCase().split(/\s+/)
+
+    const commonWords = userWords.filter(word => answerWords.includes(word))
+    const threshold = Math.ceil(answerWords.length * 0.5)
+    const correctMessage = "You got it correct!"
+    const wrongMessage = "You got it wrong, try again!"
+
+    if (commonWords.length >= threshold) {
+      console.log("correct")
+      handleScore()
+      setAftertMsg(correctMessage)
+
+    } else {
+      console.log("incorrect")
+      setAftertMsg(wrongMessage)
+      setCurrStreak(0)
+    }
+    setUserInput("")
+  }
 
   return (
     <div className="container">
       <div className="header">
         <h1>Data Structures Quiz</h1>
         <p className="subtitle">Test your knowledge of data structures and algorithms</p>
+      </div>
+
+      <div className="scoreContainer">
+        <h4>Score: {topScore}</h4>
+        <h4>Current Streak: {currStreak}</h4>
       </div>
 
       <div className="progress-container">
@@ -126,6 +168,22 @@ function App() {
         </div>
       </div>
 
+      <div className="aftermessage-container">
+        {AfterMsg}
+      </div>
+
+      <div className="userInputContainer">
+        <input className="inputBox" 
+          placeholder="Type your answer here"
+          type="text"
+          value={userInput}
+          onChange={handleuserInput}>
+        </input>
+        <button className="nav-button-2" onClick={checkUserAnswer}>
+          Check answer
+        </button>
+
+      </div>
       <div className="controls">
         <button className="nav-button prev" onClick={handlePrevClick}>
           Previous
@@ -133,6 +191,7 @@ function App() {
         <button className="nav-button next" onClick={handleNextClick}>
           Next
         </button>
+        <button className="nav-button shuffle" onClick={handleShuffle}> Shuffle</button>
       </div>
     </div>
   )
