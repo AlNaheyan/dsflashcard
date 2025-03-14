@@ -36,7 +36,7 @@ const flashcards = [
   },
   {
     question: "How does the Breadth-First Search (BFS) algorithm explore a graph?",
-    answer: "Uses a queue, explores level by level",
+    answer: "Uses a queue",
     difficulty: "medium",
   },
   {
